@@ -4,7 +4,7 @@ exports.up = function(knex, Promise) {
     knex.schema.createTable('restaurants',function(table){
       table.increments('id').primary()
       table.string('name')
-      table.string('cuisine')
+      table.string('type')
 
 
       table.timestamps()
