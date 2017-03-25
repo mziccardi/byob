@@ -98,7 +98,8 @@ app.post('/api/users', (request, response)=>{
         })
     })
 })
-app.post('/api/reviews/:restaurantId/reviews', (request, response)=>{
+//post a review
+app.post('/api/reviews', (request, response)=>{
   const { restaurantId, userId, review } = request.body;
   const newReview = { restaurantId, userId, review, created_at: new Date };
 
@@ -121,3 +122,5 @@ app.post('/api/reviews/:restaurantId/reviews', (request, response)=>{
 app.listen(app.get('port'), ()=>{
   console.log(`${app.locals.title} is running at ${app.get('port')}`)
 })
+
+module.exports = app
