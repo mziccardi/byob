@@ -116,6 +116,19 @@ app.post('/api/reviews', (request, response)=>{
     })
 })
 
+//delete a restaurant
+app.delete('/api/restaurants/:id', (request,response)=>{
+  const { id } = request.params
+  database('restaurants').where('id', id).delete()
+    .then((restaurants)=>{
+      response.status(200).json(restaurants)
+    })
+    .catch((error)=>{
+      response.status(500)
+      console.error('DELETE RESTAURANT NOT WORKING')
+    })
+})
+
 
 
 
