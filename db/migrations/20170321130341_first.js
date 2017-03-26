@@ -5,7 +5,7 @@ exports.up = function(knex, Promise) {
       table.increments('id').primary();
       table.string('name');
       table.string('type');
-      table.timestamps()
+      table.timestamps();
     }),
 
     knex.schema.createTable('reviews', function(table){
