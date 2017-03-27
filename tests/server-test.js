@@ -388,25 +388,25 @@ afterEach((done)=>{
    })
 })
 describe('DELETE /api/reviews/:id', () => {
-  beforeEach(function(done) {
-  knex.migrate.rollback()
-  .then(function() {
-    knex.migrate.latest()
-    .then(function() {
-      return database.seed.run()
-      .then(function() {
-        done();
-      });
-    });
-  });
-});
-afterEach((done)=>{
-  knex.migrate.rollback()
-  .then(()=>{
-    done()
-  })
-})
-  it('should delete review that matches ID', (done) => {
+//   beforeEach(function(done) {
+//   knex.migrate.rollback()
+//   .then(function() {
+//     knex.migrate.latest()
+//     .then(function() {
+//       return database.seed.run()
+//       .then(function() {
+//         done();
+//       });
+//     });
+//   });
+// });
+// afterEach((done)=>{
+//   knex.migrate.rollback()
+//   .then(()=>{
+//     done()
+//   })
+// })
+  it.only('should delete review that matches ID', (done) => {
      chai.request(app)
      .delete('/api/reviews/1')
      .end((err, res) => {
@@ -414,7 +414,6 @@ afterEach((done)=>{
        expect(res).to.have.status(200);
        expect(res).to.be.json;
        expect(res.body).to.be.a('array');
-      //  expect(res.body).to.have.length(29);
        done();
      })
    })
