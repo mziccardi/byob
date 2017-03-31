@@ -43,6 +43,14 @@ afterEach((done)=>{
       done()
     })
   })
+  it(' should return an error if restaurants not found', (done)=>{
+    chai.request(app)
+    .get('/api/restrantss')
+    .end((err,res)=>{
+      expect(res).to.have.status(404)
+      done()
+    })
+  })
 })
 describe('GET /api/users', ()=>{
   beforeEach(function(done) {
@@ -72,6 +80,14 @@ afterEach((done)=>{
       expect(res).to.be.json
       expect(res.body).to.be.a('array')
       expect(res.body).to.have.length(30)
+      done()
+    })
+  })
+  it(' should return an error if users not found', (done)=>{
+    chai.request(app)
+    .get('/api/usrs')
+    .end((err,res)=>{
+      expect(res).to.have.status(404)
       done()
     })
   })
@@ -125,6 +141,14 @@ afterEach((done)=>{
       expect(res).to.be.json
       expect(res.body).to.be.a('array')
       expect(res.body).to.have.length(30)
+      done()
+    })
+  })
+  it(' should return an error if reviews not found', (done)=>{
+    chai.request(app)
+    .get('/api/reveiws')
+    .end((err,res)=>{
+      expect(res).to.have.status(404)
       done()
     })
   })
@@ -251,6 +275,7 @@ afterEach((done)=>{
       done();
     })
   })
+
 })
 describe('POST /api/users',()=>{
   beforeEach(function(done) {
@@ -342,7 +367,7 @@ afterEach((done)=>{
     done()
   })
 })
-  it('should delete record that matches ID', (done) => {
+  it('should delete record that matches ID', () => {
      chai.request(app)
      .delete('/api/restaurants/30')
      .end((err, res) => {
@@ -350,12 +375,12 @@ afterEach((done)=>{
        expect(res).to.have.status(200);
        expect(res).to.be.json;
        expect(res.body).to.be.a('array');
-      //  expect(res.body).to.have.length(29);
+       expect(res.body).to.have.length(29);
        done();
      })
    })
 })
-describe('DELETE /api/users/:id', () => {
+describe('DELETE /api/users/:id', (done) => {
   beforeEach(function(done) {
   knex.migrate.rollback()
   .then(function() {
@@ -376,13 +401,13 @@ afterEach((done)=>{
 })
   it('should delete user that matches ID', (done) => {
      chai.request(app)
-     .delete('/api/users/1')
+     .delete('/api/users/20')
      .end((err, res) => {
        if(err) { done(err) }
        expect(res).to.have.status(200);
        expect(res).to.be.json;
        expect(res.body).to.be.a('array');
-      //  expect(res.body).to.have.length(29);
+       expect(res.body).to.have.length(29);
        done();
      })
    })
@@ -417,4 +442,77 @@ afterEach((done)=>{
        done();
      })
    })
+})
+describe('PATCH /api/users/:id',()=>{
+  beforeEach(function(done) {
+  knex.migrate.rollback()
+  .then(function() {
+    knex.migrate.latest()
+    .then(function() {
+      return database.seed.run()
+      .then(function() {
+        done();
+      });
+    });
+  });
+});
+afterEach((done)=>{
+  knex.migrate.rollback()
+  .then(()=>{
+    done()
+  })
+})
+  it('should update a users to the array',(done)=>{
+    chai.request(app)
+    .patch('/api/users/4')
+    .send({
+      firstname: 'test name',
+      lastname: 'test last name',
+      created_at: new Date
+    })
+    .end((err,res)=>{
+      if(err){ done(err) }
+      expect(res).to.have.status(200)
+      expect(res.body[0].firstname).to.equal('test name')
+      expect(res.body[0].lastname).to.equal('test last name')
+
+      done();
+    })
+  })
+})
+describe('PATCH /api/restaurants/:id',()=>{
+  beforeEach(function(done) {
+  knex.migrate.rollback()
+  .then(function() {
+    knex.migrate.latest()
+    .then(function() {
+      return database.seed.run()
+      .then(function() {
+        done();
+      });
+    });
+  });
+});
+afterEach((done)=>{
+  knex.migrate.rollback()
+  .then(()=>{
+    done()
+  })
+})
+  it('should update a restaurants to the array',(done)=>{
+    chai.request(app)
+    .patch('/api/restaurants/4')
+    .send({
+      name: 'steves snappin dogs',
+      type: 'hotdogs',
+      created_at: new Date
+    })
+    .end((err,res)=>{
+      if(err){ done(err) }
+      expect(res).to.have.status(200)
+      expect(res.body[0].name).to.equal('steves snappin dogs')
+      expect(res.body[0].type).to.equal('hotdogs')
+      done();
+    })
+  })
 })
