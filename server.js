@@ -89,11 +89,11 @@ app.post('/api/restaurants', (request, response)=>{
     .then(()=>{
       database('restaurants').select()
         .then((restaurants) =>{
-          response.status(200).json(restaurants)
-        })
-        .catch((error) => {
-          response.status(500)
-            console.error('Cannot post a restaurant')
+          if(restaurants.length > 0){
+            response.status(200).json(restaurants)
+          }else{
+            response.status(404).send('Restaurants not found')
+          }
         })
     })
 })
@@ -106,12 +106,13 @@ app.post('/api/users', (request, response)=>{
     .then(()=>{
       database('users').select()
         .then((users) =>{
-          response.status(200).json(users)
+          if(users.length > 0){
+            response.status(200).json(users)
+          }else{
+            response.status(404).send('post users failed')
+          }
         })
-        .catch((error) => {
-          response.status(500)
-            console.error('Cannot post a user')
-        })
+
     })
 })
 //post a review
@@ -123,11 +124,11 @@ app.post('/api/reviews', (request, response)=>{
     .then(()=>{
       database('reviews').select()
         .then((reviews) =>{
-          response.status(200).json(reviews)
-        })
-        .catch((error) => {
-          response.status(500)
-            console.error('Cannot post a review')
+          if(reviews.length > 0){
+            response.status(200).json(reviews)
+          }else{
+            response.status(404).send('post review fail')
+          }
         })
     })
 })
@@ -140,12 +141,15 @@ app.delete('/api/restaurants/:id', (request,response)=>{
     .then(()=>{
       database('restaurants').select()
       .then((restaurants)=>{
-        response.status(200).json(restaurants)
+        if(restaurants.length> 0){
+          response.status(200).json(restaurants)
+        }else{
+          response.status(404).send('delete restaurant failed')
+        }
       })
     })
     .catch((error)=>{
       response.status(500)
-      console.error('DELETE RESTAURANT NOT WORKING')
     })
 })
 //delete a user
@@ -155,12 +159,15 @@ app.delete('/api/users/:id', (request,response)=>{
     .then(()=>{
       database('users').select()
       .then((users)=>{
-        response.status(200).json(users)
+        if(users.length > 0) {
+          response.status(200).json(users)
+        }else{
+          respone.status(404).send('delte users failed')
+        }
       })
     })
     .catch((error)=>{
       response.status(500)
-      console.error('DELETE RESTAURANT NOT WORKING')
     })
 })
 app.delete('/api/reviews/:id', (request,response)=>{
@@ -169,12 +176,12 @@ app.delete('/api/reviews/:id', (request,response)=>{
     .then(()=>{
       database('reviews').select()
       .then((reviews)=>{
-        response.status(200).json(reviews)
+        if(reviews.length > 0){
+          response.status(200).json(reviews)
+        }else{
+          response.status(404).send('delete review fail')
+        }
       })
-    })
-    .catch((error)=>{
-      response.status(500)
-      console.error('DELETE RESTAURANT NOT WORKING')
     })
 })
 
@@ -186,11 +193,11 @@ app.patch('/api/users/:id', (request, response)=>{
     .then(()=>{
       database('users').where('id', id).select()
         .then(users=>{
-          response.status(200).json(users)
-        })
-        .catch((error)=>{
-          response.status(500)
-          console.error('PATCH USERS BROKEN')
+          if(users.length > 0){
+            response.status(200).json(users)
+          }else{
+            response.status(404).send('patch users failed')
+          }
         })
     })
 })
@@ -198,17 +205,16 @@ app.patch('/api/users/:id', (request, response)=>{
 app.patch('/api/restaurants/:id', (request, response)=>{
   const { id } = request.params
   const { name, type } = request.body
-  console.log('this is id', id, 'this is name',name, 'thisis type',type);
 
   database('restaurants').where('id', id).update({ name , type})
     .then(()=>{
       database('restaurants').where('id', id).select()
         .then(restaurants=>{
-          response.status(200).json(restaurants)
-        })
-        .catch((error)=>{
-          response.status(500)
-          console.error('PATCH RESTAURANTS BROKEN')
+          if(restaurants.length >0){
+            response.status(200).json(restaurants)
+          }else{
+            response.status(404).send('patch restaurants broken')
+          }
         })
     })
 })
@@ -219,11 +225,11 @@ app.patch('/api/reviews/:id', (request, response)=>{
     .then(()=>{
       database('reviews').where('id', id).select()
         .then(reviews=>{
-          response.status(200).json(reviews)
-        })
-        .catch((error)=>{
-          response.status(500)
-          console.error('PATCH REVIEWS BROKEN')
+          if(reviews.length > 0 ){
+            response.status(200).json(reviews)
+          }else{
+            response.status(404).send('Patch reviews failing')
+          }
         })
     })
 })
