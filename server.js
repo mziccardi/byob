@@ -12,40 +12,42 @@ app.set('port', process.env.PORT || 3000)
 app.locals.title = 'BYOB'
 
 //all restaurants
-app.get('/api/restaurants', (request, response) => {
+app.get('/api/restaurants',(request, response) =>{
   database('restaurants').select()
-    .then((restaurants) => {
-      response.status(200).json(restaurants);
-    })
-    .catch((error) => {
-      console.error('something is wrong with the db');
+    .then((restaurants) =>{
+      if(restaurants.length > 0){
+      response.status(200).json(restaurants)
+    }else{
+      response.status(404).send('restaurants not found')
+    }
     })
 })
 //all users
 app.get('/api/users',(request, response) =>{
   database('users').select()
     .then((users) =>{
+      if(users.length > 0){
       response.status(200).json(users)
-    })
-    .catch((error)=>{
-      response.status(400)
-      console.error('USERS DONT WORK')
+    }else{
+      response.status(404).send('users not found')
+    }
     })
 })
 //get all reviews
 app.get('/api/reviews',(request, response) =>{
   database('reviews').select()
     .then((reviews) =>{
+      if(reviews.length > 0){
       response.status(200).json(reviews)
-    })
-    .catch((error)=>{
-      response.status(400)
-      console.error('REVIEWS DONT WORK')
+    }else{
+      response.status(404).send('reviews not found')
+    }
     })
 })
 //find reviews that a user has posted
 app.get('/api/reviews/:userId', (request,response)=>{
-  database('reviews').where('userId', request.params.userId)
+  const { userId } = request.params
+  database('reviews').where('userId', userId)
   .then((reviews) =>{
     if(reviews.length>0){
     response.status(200).json(reviews)
@@ -55,7 +57,8 @@ app.get('/api/reviews/:userId', (request,response)=>{
   })
 })
 app.get('/api/users/:id', (request,response)=>{
-  database('users').where('id', request.params.id)
+  const { id } = request.params
+  database('users').where('id', id)
   .then((users) =>{
     if(users.length>0){
     response.status(200).json(users)
@@ -66,7 +69,8 @@ app.get('/api/users/:id', (request,response)=>{
 })
 //find reviews for a restaurant
 app.get('/api/restaurants/:id', (request,response) => {
-  database('reviews').where('restaurantId', request.params.id)
+  const { id } = request.params
+  database('reviews').where('restaurantId', id)
     .then((reviews) =>{
       if(reviews.length>0){
       response.status(200).json(reviews)
@@ -85,11 +89,11 @@ app.post('/api/restaurants', (request, response)=>{
     .then(()=>{
       database('restaurants').select()
         .then((restaurants) =>{
-          response.status(200).json(restaurants)
-        })
-        .catch((error) => {
-          response.status(500)
-            console.error('Cannot post a restaurant')
+          if(restaurants.length > 0){
+            response.status(200).json(restaurants)
+          }else{
+            response.status(404).send('Restaurants not found')
+          }
         })
     })
 })
@@ -102,12 +106,13 @@ app.post('/api/users', (request, response)=>{
     .then(()=>{
       database('users').select()
         .then((users) =>{
-          response.status(200).json(users)
+          if(users.length > 0){
+            response.status(200).json(users)
+          }else{
+            response.status(404).send('post users failed')
+          }
         })
-        .catch((error) => {
-          response.status(500)
-            console.error('Cannot post a user')
-        })
+
     })
 })
 //post a review
@@ -119,95 +124,112 @@ app.post('/api/reviews', (request, response)=>{
     .then(()=>{
       database('reviews').select()
         .then((reviews) =>{
-          response.status(200).json(reviews)
-        })
-        .catch((error) => {
-          response.status(500)
-            console.error('Cannot post a review')
+          if(reviews.length > 0){
+            response.status(200).json(reviews)
+          }else{
+            response.status(404).send('post review fail')
+          }
         })
     })
 })
 
 //delete a restaurant
+// todo figure out catch for not throwing error if id is already deleted
 app.delete('/api/restaurants/:id', (request,response)=>{
   const { id } = request.params
   database('restaurants').where('id', id).delete()
-    .then((restaurants)=>{
-      response.status(200).json(restaurants)
+    .then(()=>{
+      database('restaurants').select()
+      .then((restaurants)=>{
+        if(restaurants.length> 0){
+          response.status(200).json(restaurants)
+        }else{
+          response.status(404).send('delete restaurant failed')
+        }
+      })
     })
     .catch((error)=>{
       response.status(500)
-      console.error('DELETE RESTAURANT NOT WORKING')
     })
 })
 //delete a user
 app.delete('/api/users/:id', (request,response)=>{
   const { id } = request.params
   database('users').where('id', id).delete()
-    .then((users)=>{
-      response.status(200).json(users)
+    .then(()=>{
+      database('users').select()
+      .then((users)=>{
+        if(users.length > 0) {
+          response.status(200).json(users)
+        }else{
+          respone.status(404).send('delte users failed')
+        }
+      })
     })
     .catch((error)=>{
       response.status(500)
-      console.error('DELETE USER NOT WORKING')
     })
 })
 app.delete('/api/reviews/:id', (request,response)=>{
   const { id } = request.params
   database('reviews').where('id', id).delete()
-    .then((users)=>{
-      response.status(200).json(users)
-    })
-    .catch((error)=>{
-      response.status(500)
-      console.error('DELETE REVIEWS NOT WORKING')
+    .then(()=>{
+      database('reviews').select()
+      .then((reviews)=>{
+        if(reviews.length > 0){
+          response.status(200).json(reviews)
+        }else{
+          response.status(404).send('delete review fail')
+        }
+      })
     })
 })
 
 //patch users
 app.patch('/api/users/:id', (request, response)=>{
-  const id = request.params
+  const { id } = request.params
   const { firstname, lastname } = request.body
   database('users').where('id', id).update({ firstname , lastname })
     .then(()=>{
       database('users').where('id', id).select()
         .then(users=>{
-          response.status(200).json(users)
-        })
-        .catch((error)=>{
-          response.status(500)
-          console.error('PATCH USERS BROKEN')
+          if(users.length > 0){
+            response.status(200).json(users)
+          }else{
+            response.status(404).send('patch users failed')
+          }
         })
     })
 })
 //patch restaurant
 app.patch('/api/restaurants/:id', (request, response)=>{
-  const id = request.params
+  const { id } = request.params
   const { name, type } = request.body
+
   database('restaurants').where('id', id).update({ name , type})
     .then(()=>{
       database('restaurants').where('id', id).select()
         .then(restaurants=>{
-          response.status(200).json(restaurants)
-        })
-        .catch((error)=>{
-          response.status(500)
-          console.error('PATCH RESTAURANTS BROKEN')
+          if(restaurants.length >0){
+            response.status(200).json(restaurants)
+          }else{
+            response.status(404).send('patch restaurants broken')
+          }
         })
     })
 })
 app.patch('/api/reviews/:id', (request, response)=>{
-  const id = request.params
+  const { id } = request.params
   const { review } = request.body
   database('reviews').where('id', id).update({ review })
     .then(()=>{
       database('reviews').where('id', id).select()
         .then(reviews=>{
-          response.status(200).json(reviews)
-        })
-        .catch((error)=>{
-          response.status(500)
-          console.error('PATCH REVIEWS BROKEN')
+          if(reviews.length > 0 ){
+            response.status(200).json(reviews)
+          }else{
+            response.status(404).send('Patch reviews failing')
+          }
         })
     })
 })
